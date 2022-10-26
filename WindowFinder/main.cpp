@@ -18,8 +18,6 @@ int main(int argc, char* argv[])
 	//Allow app to set foreground
 	AllowSetForegroundWindow(GetCurrentProcessId());
 
-	setvbuf(stdin, NULL, _IONBF, 0);
-
 	//Main Loop
 	while (TRUE) {
 		//Variables
@@ -70,8 +68,7 @@ int main(int argc, char* argv[])
 				std::wcout << "Error - Window was not found" << std::endl << std::endl;
 			}
 			else {
-				for (int i = 0; i < WindowsFound.size(); i++)
-				{
+				for (int i = 0; i < WindowsFound.size(); i++) {
 					ConsolePrintWindowInfo(*(WindowsFound[i]));
 					std::wcout << std::endl;
 				}
@@ -81,7 +78,9 @@ int main(int argc, char* argv[])
 		}
 
 		std::wcout << "[F1] Find Another Window" << std::endl;
-		std::wcout << "[F2] Exit" << std::endl << std::endl;
+		std::wcout << "[F2] Exit";
+
+		//User Options Input
 		while (TRUE) {
 			if (GetAsyncKeyState(VK_F1)) {
 				KeyUp(VK_F1);
@@ -93,6 +92,7 @@ int main(int argc, char* argv[])
 			}
 		}
 
+		//Clear console screen
 		system("cls");
 	}
 }
