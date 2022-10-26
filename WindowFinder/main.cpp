@@ -18,8 +18,6 @@ int main(int argc, char* argv[])
 	//Allow app to set foreground
 	AllowSetForegroundWindow(GetCurrentProcessId());
 
-	setvbuf(stdin, NULL, _IONBF, 0);
-
 	//Main Loop
 	while (TRUE) {
 		//Variables
@@ -81,7 +79,7 @@ int main(int argc, char* argv[])
 		}
 
 		std::wcout << "[F1] Find Another Window" << std::endl;
-		std::wcout << "[F2] Exit" << std::endl << std::endl;
+		std::wcout << "[F2] Exit";
 		while (TRUE) {
 			if (GetAsyncKeyState(VK_F1)) {
 				KeyUp(VK_F1);
