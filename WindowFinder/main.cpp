@@ -57,10 +57,12 @@ int main(int argc, char* argv[])
 		}
 
 		if (WindowsFound.size() == 1) {
-			ShowWindow(WindowsFound[0]->hWnd, SW_NORMAL);
+			ShowWindow(WindowsFound[0]->hWnd, SW_SHOWNOACTIVATE);
 			SetForegroundWindow(WindowsFound[0]->hWnd);
 			ConsolePrintWindowInfo(*(WindowsFound[0]));
 			std::wcout << std::endl;
+			Sleep(100);
+			SetForegroundWindow(GetConsoleWindow());
 		}
 		else
 		{
