@@ -119,6 +119,7 @@ uint32_t Console::PollEvents()
 		if (GetAsyncKeyState(VK_F2)) {
 			KeyUp(VK_F2);
 			bCloseConsole = true;
+			break;
 		}
 	}
 	return uint32_t();
