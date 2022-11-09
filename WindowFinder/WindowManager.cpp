@@ -48,15 +48,12 @@ HWND WindowManager::SetForegroundWindow(WINDOW_INFO& Window)
 {
 	//Check if window is minimized
 	if (IsIconic(Window.hWnd))
-	{
-		ShowWindow(Window.hWnd, SW_RESTORE);
-		ShowWindow(Window.hWnd, SW_MAXIMIZE);
-		Sleep(100);
-	}
+		PostMessage(Window.hWnd,WM_SYSCOMMAND, SC_RESTORE, 0);
 	else
 		ShowWindow(Window.hWnd, SW_SHOW);
 
 	//Set foreground window
+	Sleep(100);
 	::SetForegroundWindow(Window.hWnd);
 
 	return Window.hWnd;
@@ -75,11 +72,6 @@ void WindowManager::PrintWindowListInfo(std::vector<WINDOW_INFO>& List)
 		ConsolePrintWindowInfo(window);
 		std::wcout << std::endl;
 	}
-}
-
-std::mutex& WindowManager::GetMutex()
-{
-	return mutex;
 }
 
 void WindowManager::SetQuitStatus(bool QuitStatus)

@@ -120,6 +120,7 @@ uint32_t Console::PollEvents()
 		}
 		if (GetAsyncKeyState(VK_F2)) {
 			KeyUp(VK_F2);
+			manager->SetQuitStatus(true);
 			bCloseConsole = true;
 			break;
 		}
