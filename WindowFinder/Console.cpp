@@ -15,7 +15,6 @@ uint32_t Console::SetupConsole()
 	TCHAR szConsoleName[MAX_PATH];
 	RECT rect;
 
-
 	//Get Console Info
 	if (!(hWnd = GetConsoleWindow()))
 	{
@@ -48,7 +47,10 @@ uint32_t Console::SetupConsole()
 
 	//Setup Windows Manager
 	manager = new WindowManager();
-	manager->Setup();
+	if(!manager->Setup())
+	{
+		std::wcout << "Error - Could not setup Window Manager " << std::endl;
+	}
 
 	return EXIT_SUCCESS;
 }
@@ -75,11 +77,11 @@ uint32_t Console::GetUserInput()
 {
 	//Variables
 	String sInput, sWindowName;
-	TCHAR szInputBuffer[120];
+	TCHAR szInputBuffer[MAX_PATH];
 
 	//Take user input
 	std::wcout << "Input a substring: ";
-	std::wcin.getline(szInputBuffer, 120);
+	std::wcin.getline(szInputBuffer, MAX_PATH);
 	std::wcout << std::endl;
 	sInput.assign(szInputBuffer);
 

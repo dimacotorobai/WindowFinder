@@ -22,6 +22,8 @@ bool WindowManager::Setup()
 
 std::vector<WINDOW_INFO> WindowManager::FindWindow(String PartialString)
 {
+	String sWindowName;
+
 	//Clear found windows buffer
 	WindowsFound.clear();
 
@@ -29,8 +31,10 @@ std::vector<WINDOW_INFO> WindowManager::FindWindow(String PartialString)
 	mutex.lock();
 	for (const auto& window : *WindowList)
 	{
-		String WindowName(window.szWindowName);
-		if (!WindowName.find(PartialString))
+		sWindowName.empty();
+		sWindowName.assign(window.szWindowName);
+
+		if (sWindowName.find(PartialString) != std::string::npos)
 		{
 			WindowsFound.push_back(window);
 		}
@@ -44,7 +48,11 @@ HWND WindowManager::SetForegroundWindow(WINDOW_INFO& Window)
 {
 	//Check if window is minimized
 	if (IsIconic(Window.hWnd))
+	{
 		ShowWindow(Window.hWnd, SW_RESTORE);
+		ShowWindow(Window.hWnd, SW_MAXIMIZE);
+		Sleep(100);
+	}
 	else
 		ShowWindow(Window.hWnd, SW_SHOW);
 
@@ -93,6 +101,10 @@ WindowManager::~WindowManager()
 
 uint32_t WindowManager::BackgroundThread()
 {
+	//Fill both buffers
+	EnumarateOSWindows(Buffer1);
+	Buffer2 = Buffer1;
+
 	while (!bQuitBackgroundTread)
 	{
 		if (WindowList == &Buffer1)
