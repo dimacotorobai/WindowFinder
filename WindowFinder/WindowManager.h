@@ -11,7 +11,6 @@ public:
 	void PrintWindowInfo(WINDOW_INFO& Window);
 	void PrintWindowListInfo(std::vector<WINDOW_INFO>& List);
 
-	std::mutex& GetMutex();
 	void SetQuitStatus(bool QuitStatus);
 	bool ShouldQuit();
 
