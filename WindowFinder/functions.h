@@ -9,6 +9,8 @@ int SetConsoleMode();
 
 BOOL ConsolePrintWindowInfo(const WINDOW_INFO& window);
 
+void ClearConsoleOutput(HANDLE hConsole);
+
 void KeyDown(BYTE vk);
 
 void KeyUp(BYTE vk);

@@ -27,6 +27,6 @@ private:
 	std::vector<WINDOW_INFO>* WindowList;
 	std::vector<WINDOW_INFO> WindowsFound;
 	std::mutex mutex;
-	std::thread* threadObject;
+	std::thread threadObject;
 };
 

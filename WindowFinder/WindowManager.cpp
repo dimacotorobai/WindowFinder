@@ -16,7 +16,7 @@ WindowManager::WindowManager()
 
 bool WindowManager::Setup()
 {
-	threadObject = new std::thread(&WindowManager::BackgroundThread, this);
+	threadObject = std::move(std::thread{ &WindowManager::BackgroundThread, this });
 	return true;
 }
 
@@ -31,7 +31,6 @@ std::vector<WINDOW_INFO> WindowManager::FindWindow(String PartialString)
 	mutex.lock();
 	for (const auto& window : *WindowList)
 	{
-		sWindowName.empty();
 		sWindowName.assign(window.szWindowName);
 
 		if (sWindowName.find(PartialString) != std::string::npos)
@@ -62,6 +61,7 @@ HWND WindowManager::SetForegroundWindow(WINDOW_INFO& Window)
 void WindowManager::PrintWindowInfo(WINDOW_INFO& Window)
 {
 	ConsolePrintWindowInfo(Window);
+	
 	std::wcout << std::endl;
 }
 
@@ -88,7 +88,7 @@ bool WindowManager::ShouldQuit()
 WindowManager::~WindowManager()
 {
 	bQuitBackgroundTread = true;
-	threadObject->join();
+	threadObject.join();
 }
 
 uint32_t WindowManager::BackgroundThread()
@@ -119,7 +119,7 @@ uint32_t WindowManager::BackgroundThread()
 		}
 		else
 		{
-			std::cout << "Windows Manager: Error - WindowList does not point to any buffer" << std::endl;
+			std::wcout << "Windows Manager: Error - WindowList does not point to any buffer" << std::endl;
 			return EXIT_FAILURE;
 		}
 

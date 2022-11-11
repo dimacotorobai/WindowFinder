@@ -11,7 +11,6 @@ int main(int argc, char* argv[])
 	Console console(TEXT("Window Finder"));
 	console.SetupConsole();
 
-
 	//Main Loop
 	while (!console.ShouldQuit()) {
 		console.Display();

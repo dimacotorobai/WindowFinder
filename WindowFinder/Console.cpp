@@ -5,13 +5,13 @@
 #include "Console.h"
 
 Console::Console(String ConsoleName, uint16_t SizeX, uint16_t SizeY) 
-	: sConsoleName(ConsoleName), uSizeX(SizeX), uSizeY(SizeY), bCloseConsole(false)
-{}
+	:	sConsoleName(ConsoleName), uSizeX(SizeX), uSizeY(SizeY),
+		bCloseConsole(false), manager(nullptr),dwPID(0), hWnd(nullptr)
+{
+}
 
 uint32_t Console::SetupConsole()
 {
-	//Variables
-	uint32_t uStatus;
 	TCHAR szConsoleName[MAX_PATH];
 	RECT rect;
 
@@ -57,23 +57,20 @@ uint32_t Console::SetupConsole()
 
 void Console::Display()
 {
-	//Clear previous display
-	system("cls");
-
 	//Front Menu UI
-	std::wcout << R"(////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////)" << std::endl;
-	std::wcout << R"(////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////)" << std::endl;
-	std::wcout << R"(//////////////////////  __        ___           _                 _____ _           _             //////////////////////)" << std::endl;
-	std::wcout << R"(//////////////////////  \ \      / (_)_ __   __| | _____      __ |  ___(_)_ __   __| | ___ _ __   //////////////////////)" << std::endl;
-	std::wcout << R"(//////////////////////   \ \ /\ / /| | '_ \ / _` |/ _ \ \ /\ / / | |_  | | '_ \ / _` |/ _ \ '__|  //////////////////////)" << std::endl;
-	std::wcout << R"(//////////////////////    \ V  V / | | | | | (_| | (_) \ V  V /  |  _| | | | | | (_| |  __/ |     //////////////////////)" << std::endl;
-	std::wcout << R"(//////////////////////     \_/\_/  |_|_| |_|\__,_|\___/ \_/\_/   |_|   |_|_| |_|\__,_|\___|_|     //////////////////////)" << std::endl;
-	std::wcout << R"(//////////////////////                                                                            //////////////////////)" << std::endl;
-	std::wcout << R"(////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////)" << std::endl;
-	std::wcout << R"(////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////)" << std::endl;
+	std::wcout << R"(////////////////////////////////////////////////////////////////////////////////////////////////////////////////////)" << std::endl;
+	std::wcout << R"(////////////////////////////////////////////////////////////////////////////////////////////////////////////////////)" << std::endl;
+	std::wcout << R"(////////////////////  __        ___           _                 _____ _           _             ////////////////////)" << std::endl;
+	std::wcout << R"(////////////////////  \ \      / (_)_ __   __| | _____      __ |  ___(_)_ __   __| | ___ _ __   ////////////////////)" << std::endl;
+	std::wcout << R"(////////////////////   \ \ /\ / /| | '_ \ / _` |/ _ \ \ /\ / / | |_  | | '_ \ / _` |/ _ \ '__|  ////////////////////)" << std::endl;
+	std::wcout << R"(////////////////////    \ V  V / | | | | | (_| | (_) \ V  V /  |  _| | | | | | (_| |  __/ |     ////////////////////)" << std::endl;
+	std::wcout << R"(////////////////////     \_/\_/  |_|_| |_|\__,_|\___/ \_/\_/   |_|   |_|_| |_|\__,_|\___|_|     ////////////////////)" << std::endl;
+	std::wcout << R"(////////////////////                                                                            ////////////////////)" << std::endl;
+	std::wcout << R"(////////////////////////////////////////////////////////////////////////////////////////////////////////////////////)" << std::endl;
+	std::wcout << R"(////////////////////////////////////////////////////////////////////////////////////////////////////////////////////)" << std::endl;
 	std::wcout << std::endl;
 
-	return void();
+	return;
 }
 
 uint32_t Console::GetUserInput()
@@ -118,11 +115,22 @@ uint32_t Console::PollEvents()
 	std::wcout << "[F2] Exit";
 	while (TRUE) {
 		if (GetAsyncKeyState(VK_F1)) {
+			//Release key
 			KeyUp(VK_F1);
+
+			//Erase leftover char
+			KeyDown(VK_BACK);
+			KeyUp(VK_BACK);
+
+			//Clear console output
+			ClearConsoleOutput(GetStdHandle(STD_OUTPUT_HANDLE));
 			break;
 		}
 		if (GetAsyncKeyState(VK_F2)) {
+			//Release key
 			KeyUp(VK_F2);
+
+			//Quit Window Manager and console
 			manager->SetQuitStatus(true);
 			bCloseConsole = true;
 			break;
