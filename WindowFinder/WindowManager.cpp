@@ -4,46 +4,42 @@
 #include "functions.h"
 #include "WindowManager.h"
 
-WindowManager::WindowManager()
-	: WindowList(&Buffer1), bQuitManager(false), bQuitBackgroundTread(false)
+WindowManager::WindowManager() noexcept
+	: m_pWindowList(&m_Buffer1), m_bQuitManager(false), m_bQuitBackgroundTread(false)
 {
-	Buffer1.reserve(500);
-	Buffer2.reserve(500);
-	WindowsFound.reserve(500);
+	m_Buffer1.reserve(500);
+	m_Buffer2.reserve(500);
+	m_WindowsFound.reserve(500);
 
-	WindowList = &Buffer1;
+	m_pWindowList = &m_Buffer1;
 }
 
-bool WindowManager::Setup()
+bool WindowManager::Setup() noexcept
 {
-	threadObject = std::move(std::thread{ &WindowManager::BackgroundThread, this });
+	m_ThreadObject = std::move(std::thread{ &WindowManager::BackgroundThread, this });
 	return true;
 }
 
-std::vector<WINDOW_INFO> WindowManager::FindWindow(String PartialString)
+std::vector<WINDOW_INFO> WindowManager::FindWindow(String PartialString) noexcept
 {
-	String sWindowName;
-
 	//Clear found windows buffer
-	WindowsFound.clear();
+	m_WindowsFound.clear();
 
 	//Enum Window List and find matching windows
-	mutex.lock();
-	for (const auto& window : *WindowList)
+	m_Mutex.lock();
+	for (const auto& window : *m_pWindowList)
 	{
-		sWindowName.assign(window.szWindowName);
-
-		if (sWindowName.find(PartialString) != std::string::npos)
+		if (String(window.szWindowName).find(PartialString) != std::string::npos)
 		{
-			WindowsFound.push_back(window);
+			m_WindowsFound.push_back(window);
 		}
 	}
-	mutex.unlock();
+	m_Mutex.unlock();
 
-	return WindowsFound;
+	return m_WindowsFound;
 }
 
-HWND WindowManager::SetForegroundWindow(WINDOW_INFO& Window)
+HWND WindowManager::SetForeground(WINDOW_INFO& Window) const noexcept
 {
 	//Check if window is minimized
 	if (IsIconic(Window.hWnd))
@@ -53,19 +49,18 @@ HWND WindowManager::SetForegroundWindow(WINDOW_INFO& Window)
 
 	//Set foreground window
 	Sleep(100);
-	::SetForegroundWindow(Window.hWnd);
+	SetForegroundWindow(Window.hWnd);
 
 	return Window.hWnd;
 }
 
-void WindowManager::PrintWindowInfo(WINDOW_INFO& Window)
+void WindowManager::PrintWindowInfo(WINDOW_INFO& Window) const noexcept
 {
 	ConsolePrintWindowInfo(Window);
-	
 	std::wcout << std::endl;
 }
 
-void WindowManager::PrintWindowListInfo(std::vector<WINDOW_INFO>& List)
+void WindowManager::PrintWindowListInfo(std::vector<WINDOW_INFO>& List) const noexcept
 {
 	for (const auto& window : List)
 	{
@@ -74,48 +69,58 @@ void WindowManager::PrintWindowListInfo(std::vector<WINDOW_INFO>& List)
 	}
 }
 
-void WindowManager::SetQuitStatus(bool QuitStatus)
+void WindowManager::SetWindow(const WINDOW_INFO& Window) noexcept
 {
-	bQuitBackgroundTread = QuitStatus;
-	bQuitManager = QuitStatus;
+	m_Window = WINDOW_INFO(Window);
 }
 
-bool WindowManager::ShouldQuit()
+const WINDOW_INFO& WindowManager::GetWindow() const noexcept
 {
-	return bQuitManager;
+	return m_Window;
+}
+
+void WindowManager::SetQuitStatus(bool QuitStatus) noexcept
+{
+	m_bQuitBackgroundTread = QuitStatus;
+	m_bQuitManager = QuitStatus;
+}
+
+bool WindowManager::ShouldQuit() const noexcept
+{
+	return m_bQuitManager;
 }
 
 WindowManager::~WindowManager()
 {
-	bQuitBackgroundTread = true;
-	threadObject.join();
+	m_bQuitBackgroundTread = true;
+	m_ThreadObject.join();
 }
 
-uint32_t WindowManager::BackgroundThread()
+uint32_t WindowManager::BackgroundThread() noexcept
 {
 	//Fill both buffers
-	EnumarateOSWindows(Buffer1);
-	Buffer2 = Buffer1;
+	EnumarateOSWindows(m_Buffer1);
+	m_Buffer2 = m_Buffer1;
 
-	while (!bQuitBackgroundTread)
+	while (!m_bQuitBackgroundTread)
 	{
-		if (WindowList == &Buffer1)
+		if (m_pWindowList == &m_Buffer1)
 		{
-			Buffer2.clear();
-			EnumarateOSWindows(Buffer2);
+			m_Buffer2.clear();
+			EnumarateOSWindows(m_Buffer2);
 			
-			mutex.lock();
-			WindowList = &Buffer2;
-			mutex.unlock();
+			m_Mutex.lock();
+			m_pWindowList = &m_Buffer2;
+			m_Mutex.unlock();
 		}
-		else if (WindowList == &Buffer2)
+		else if (m_pWindowList == &m_Buffer2)
 		{
-			Buffer1.clear();
-			EnumarateOSWindows(Buffer1);
+			m_Buffer1.clear();
+			EnumarateOSWindows(m_Buffer1);
 
-			mutex.lock();
-			WindowList = &Buffer1;
-			mutex.unlock();
+			m_Mutex.lock();
+			m_pWindowList = &m_Buffer1;
+			m_Mutex.unlock();
 		}
 		else
 		{

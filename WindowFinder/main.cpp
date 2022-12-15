@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 
 	//Main Loop
 	while (!console.ShouldQuit()) {
-		console.Display();
+		console.ShowUserInterface();
 		console.GetUserInput();
 		console.PollEvents();
 	}
