@@ -39,6 +39,7 @@ BOOL CALLBACK EnumarateWindowFunction(HWND hWnd, LPARAM lParam)
 		if (tempBuffer.dwPID)
 		{
 			GetWindowText(hWnd, tempBuffer.szWindowName, MAX_PATH);
+			GetProcessCreationTime(tempBuffer.dwPID, &tempBuffer.tCreationTime);
 
 			if (lstrlen(tempBuffer.szWindowName))
 			{
@@ -56,6 +57,36 @@ BOOL EnumarateOSWindows(std::vector<WINDOW_INFO>& WindowList)
 	return TRUE;
 }
 
+DWORD GetProcessCreationTime(DWORD dwPID, LPSYSTEMTIME lpBuffer) {
+	HANDLE					hProcess;
+	FILETIME				creationTime, discard;
+	LPFILETIME				_ = &discard;
+	SYSTEMTIME				utcSystemTime;
+	TIME_ZONE_INFORMATION	tzi;
+
+	//Zero Buffer
+	memset(lpBuffer, 0x0, sizeof(*lpBuffer));
+
+	//Get handle to process
+	hProcess = OpenProcess(
+		PROCESS_QUERY_INFORMATION | PROCESS_QUERY_LIMITED_INFORMATION,
+		FALSE,
+		dwPID
+	);
+
+	//Skip if OpenProcess Failed
+	if (!hProcess) return GetLastError();
+
+	GetProcessTimes(hProcess, &creationTime, _, _, _);
+	FileTimeToSystemTime(&creationTime, &utcSystemTime);
+
+	GetTimeZoneInformation(&tzi);
+	SystemTimeToTzSpecificLocalTime(&tzi, &utcSystemTime, lpBuffer);
+
+	CloseHandle(hProcess);
+	return 0;
+}
+
 int SetConsoleMode()
 {
 #ifdef UNICODE
@@ -67,14 +98,36 @@ int SetConsoleMode()
 #endif // UNICODE
 }
 
+BOOL SetPrivilege(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege) {
+	LUID luid;
+	BOOL bRet = FALSE;
+
+	if (LookupPrivilegeValue(NULL, lpszPrivilege, &luid)) {
+		TOKEN_PRIVILEGES tp;
+
+		tp.PrivilegeCount = 1;
+		tp.Privileges[0].Luid = luid;
+		tp.Privileges[0].Attributes = (bEnablePrivilege) ? SE_PRIVILEGE_ENABLED : 0;
+
+		if (AdjustTokenPrivileges(hToken, FALSE, &tp, NULL, (PTOKEN_PRIVILEGES)NULL, (PDWORD)NULL))
+			bRet = (GetLastError() == ERROR_SUCCESS);
+	}
+	return bRet;
+}
+
 BOOL ConsolePrintWindowInfo(const WINDOW_INFO& window)
 {
-	
-	
 	std::wcout << "Window Name:  " << window.szWindowName << std::endl;
 	std::wcout << "|-----------> Window HWND:  0x" << std::hex << window.hWnd << std::endl;
 	std::wcout << "|-----------> Process Name: " << window.szProcessName << std::endl;
 	std::wcout << "|-----------> Process ID:   0x" << window.dwPID << std::dec << std::endl;
+	std::wcout << "|-----------> Creation Time: "
+		<< window.tCreationTime.wYear << "-"
+		<< window.tCreationTime.wMonth << "-"
+		<< window.tCreationTime.wDay << "  "
+		<< window.tCreationTime.wHour << ":"
+		<< window.tCreationTime.wMinute << ":"
+		<< window.tCreationTime.wSecond << std::endl;
 	return TRUE;
 }
 

@@ -5,7 +5,11 @@ BOOL CALLBACK EnumarateWindowFunction(HWND hWnd, LPARAM lParam);
 
 BOOL EnumarateOSWindows(std::vector<WINDOW_INFO>& WindowList);
 
+DWORD GetProcessCreationTime(DWORD dwPID, LPSYSTEMTIME lpBuffer);
+
 int SetConsoleMode();
+
+BOOL SetPrivilege(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege);
 
 BOOL ConsolePrintWindowInfo(const WINDOW_INFO& window);
 
