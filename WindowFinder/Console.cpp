@@ -152,9 +152,9 @@ uint32_t Console::PollEvents() noexcept
 
 			break;
 		}
-		if (GetAsyncKeyState(VK_F2)) {
+		if (GetAsyncKeyState(VK_F3)) {
 			//Release key
-			KeyUp(VK_F2);
+			KeyUp(VK_F3);
 
 			//Quit Window Manager and console
 			m_pManager->SetQuitStatus(true);
