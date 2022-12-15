@@ -4,21 +4,23 @@
 class Console
 {
 public:
-	Console(String ConsoleName, uint16_t SizeX = 0, uint16_t SizeY = 0);
-	uint32_t SetupConsole();
-	void Display();
-	uint32_t GetUserInput();
-	uint32_t PollEvents();
-	bool ShouldQuit();
+	Console(String ConsoleName, uint16_t SizeX = 0, uint16_t SizeY = 0) noexcept;
+	uint32_t SetupConsole() noexcept;
 
+	void ShowUserInterface() const noexcept;
+	uint32_t GetUserInput() const noexcept;
+	uint32_t PollEvents() noexcept;
+
+	bool ShouldQuit() const noexcept;
 	~Console();
 
 private:
-	bool bCloseConsole;
-	String sConsoleName;
-	uint16_t uSizeX, uSizeY;
-	HWND hWnd;
-	DWORD dwPID;
-	WindowManager *manager;
+	bool m_bCloseConsole;
+	String m_sConsoleName;
+	uint16_t m_uSizeX, m_uSizeY;
+	HWND m_hConsoleWindow;
+	DWORD m_dwPID;
+	HANDLE m_hToken;
+	WindowManager *m_pManager;
 };
 
