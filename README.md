@@ -2,7 +2,7 @@
 A simple console-based tool which allows the user to search, find, and set foreground windows. The tool is useful when dealing with systems that contain many windows and removes the manual labor involved in searching for the specific window. The searching and setting of the foreground window is fast and efficient.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/52585921/200727077-97137ee3-9d14-4783-bf73-239f6ef8ca2f.png?raw=true" alt="Window Finder Image"/>
+  <img src="https://user-images.githubusercontent.com/52585921/207977439-b7313453-1fea-4789-96ab-b560beece46a.png?raw=true" alt="Window Finder Image"/>
 </p>
 
 
